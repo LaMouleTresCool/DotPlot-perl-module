@@ -90,7 +90,15 @@ while (my ($key, $value) = each(%{$testPlot->{"upperBoxes"}}))
   is($testPlot->{"lowerBoxes"}->{$key}->{"R"}, 0, "mirroredBPS black?");
 }
 
+# test set from dot bracket
 
+$testPlot = DotPlot->new("t/TestData/dot.ps");
+
+$testPlot->setFromDotBracketString("((((----))))--------------------", DotPlot->UPPERCROSS, 1, 0, 1);
+
+ok(defined($testPlot->{"upperCrosses"}->{"1-12"}));
+ok(defined($testPlot->{"upperCrosses"}->{"2-11"}));
+ok(defined($testPlot->{"upperCrosses"}->{"3-10"}));
 
 sub equal 
 { 

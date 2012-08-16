@@ -2,6 +2,7 @@ package DotPlot;
 use strict;
 use warnings;
 
+use feature qw/switch/;
 use Storable qw(dclone);
 
 =head1 NAME
@@ -83,6 +84,17 @@ Niklas Meinzer <meinzern@informatik.uni-freiburg.de>
 
 
 =cut
+
+# these constants represent the supportet types of annotations,
+# that can be applied to the DotPlot
+use constant {
+    LOWERCROSS   => 0,
+    UPPERCROSS   => 1,
+    LOWERFULLBOX => 2,
+    UPPERFULLBOX => 3,
+    LOWEREMPTYBOX => 4,
+    UPPEREMPTYBOX => 5,
+};
 
 #######################################################################
 # Creates a new DotPlot object from a DotPlot file as created by
@@ -559,6 +571,81 @@ sub addMissingDefinitions
   {
     $self->{"definitions"}->{"ucross"} = "{\n   3 1 roll\n   exch len exch sub 1 add cross\n} bind";
   }
+}
+
+# this method takes a dot bracket string, annotation type and color
+# and applies annotations corresponding to this dot bracket string
+sub setFromDotBracketString
+{
+  my $self = shift;
+
+  my ($string, $type, $R, $G, $B) = @_;
+
+  my $annotations;
+
+  given($type) {
+    when (UPPERCROSS) { $annotations = $self->{upperCrosses}; }
+    when (LOWERCROSS) { $annotations = $self->{lowerCrosses}; }
+    when (UPPERFULLBOX) { $annotations = $self->{upperFullBoxes}; }
+    when (LOWERFULLBOX) { $annotations = $self->{lowerFullBoxes}; }
+    when (UPPEREMPTYBOX) { $annotations = $self->{upperEmptyBoxes}; }
+    when (LOWEREMPTYBOX) { $annotations = $self->{lowerEmptyBoxes}; }
+  }
+  
+  my $hash = dotBracketToHash($string);
+
+  while( my ($key, $value) = each(%{$hash})){
+    $self->setColoredEntry($key, $value, $R, $G, $B, $annotations);
+  }
+}
+
+#================================================================
+# Converts a dot bracket string into a base pair hash
+# 
+#================================================================
+sub dotBracketToHash
+{
+	my $temp = shift;
+	
+	my @input = split //,$temp;
+	
+	my @BracketTypes = ( "()" ,
+						 "[]" ,
+						 "{}" ,
+						 "<>" ,
+						 "Aa" ,
+						 "Bb");
+
+	my %Stacks = ();
+	
+	for(my $i = 0; $i < scalar(@BracketTypes); $i++)
+	{
+		$Stacks{$BracketTypes[$i]} = ();
+	}
+	
+	my %out = ();
+	
+	for (my $i = 0; $i < scalar(@input); $i++)
+	{
+	  next if($input[$i] eq ".");
+	  foreach my $BT (@BracketTypes)
+	  {
+		  my @B = split //, $BT;
+		  next unless ($input[$i] eq $B[0]) || ($input[$i] eq $B[1]);
+		  if($input[$i] eq $B[0])
+		  {
+			  push(@{$Stacks{$BT}}, $i);
+			  last;
+		  }
+		  if($input[$i] eq $B[1])
+		  {
+			  my $fb = pop(@{$Stacks{$BT}});
+			  $out{$fb} = $i;
+			  last;
+		  }
+ 	  }
+	}
+	return \%out;
 }
 1;
 
