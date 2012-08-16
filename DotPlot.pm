@@ -517,11 +517,13 @@ sub getProbability
   
   my $BP = ($fb+1) . "-" . ($sb+1);
   
-  my $prob = $self->{"upperBoxes"}->{$BP}->{"size"};
+  my $prob;
   
-  if(!defined $prob)
+  if(!defined $self->{"upperBoxes"}->{$BP})
   {
     $prob = 0;
+  } else {
+    $prob = $self->{"upperBoxes"}->{$BP}->{"size"};
   }
   
   # return $prob^2 because the Dotplot saves sqrts of probabilitys
