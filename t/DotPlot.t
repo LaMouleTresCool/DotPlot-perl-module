@@ -94,7 +94,7 @@ while (my ($key, $value) = each(%{$testPlot->{"upperBoxes"}}))
 
 $testPlot = DotPlot->new("t/TestData/dot.ps");
 
-$testPlot->setFromDotBracketString("((((----))))--------------------", DotPlot->UPPERCROSS, 1, 0, 1);
+$testPlot->annotateDotBracketString("((((----))))--------------------", DotPlot->UPPERCROSS, 1, 0, 1);
 
 ok(defined($testPlot->{"upperCrosses"}->{"1-12"}));
 ok(defined($testPlot->{"upperCrosses"}->{"2-11"}));

@@ -575,7 +575,7 @@ sub addMissingDefinitions
 
 # this method takes a dot bracket string, annotation type and color
 # and applies annotations corresponding to this dot bracket string
-sub setFromDotBracketString
+sub annotateDotBracketString
 {
   my $self = shift;
 
